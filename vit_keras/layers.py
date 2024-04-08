@@ -136,16 +136,21 @@ class TransformerBlock(tf.keras.layers.Layer):
             name="MultiHeadDotProductAttention_1",
         )
         self.mlpblock = tf.keras.Sequential(
-            [tf.keras.layers.Dense(
+            [
+                tf.keras.layers.Dense(
                     self.mlp_dim,
                     activation="linear",
-                    name=f"{self.name}_Dense_0",
+                    name=f"{self.name}/Dense_0",
                 ),
                 tf.keras.layers.Lambda(
                     lambda x: tf.keras.activations.gelu(x, approximate=False)
+                )
+                if hasattr(tf.keras.activations, "gelu")
+                else tf.keras.layers.Lambda(
+                    lambda x: tfa.activations.gelu(x, approximate=False)
                 ),
                 tf.keras.layers.Dropout(self.dropout),
-                tf.keras.layers.Dense(input_shape[-1], name=f"{self.name}_Dense_1"),
+                tf.keras.layers.Dense(input_shape[-1], name=f"{self.name}/Dense_1"),
                 tf.keras.layers.Dropout(self.dropout),
             ],
             name="MlpBlock_3",
@@ -158,7 +163,7 @@ class TransformerBlock(tf.keras.layers.Layer):
         )
         self.dropout_layer = tf.keras.layers.Dropout(self.dropout)
 
-    def call(self, inputs, training=False):
+    def call(self, inputs, training):
         x = self.layernorm1(inputs)
         x, weights = self.att(x)
         x = self.dropout_layer(x, training=training)
@@ -181,3 +186,4 @@ class TransformerBlock(tf.keras.layers.Layer):
     @classmethod
     def from_config(cls, config):
         return cls(**config)
+
