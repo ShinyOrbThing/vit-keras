@@ -158,7 +158,7 @@ class TransformerBlock(tf.keras.layers.Layer):
         )
         self.dropout_layer = tf.keras.layers.Dropout(self.dropout)
 
-    def call(self, inputs, training):
+    def call(self, inputs, training=False):
         x = self.layernorm1(inputs)
         x, weights = self.att(x)
         x = self.dropout_layer(x, training=training)
