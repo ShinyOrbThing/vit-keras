@@ -112,11 +112,11 @@ def load_weights_numpy(
         set(
             "/".join(k.split("/")[:2])
             for k in source_keys
-            if k.startswith("Transformer/encoderblock_")
+            if k.startswith("Transformer_encoderblock_")
         )
     )
     n_transformers_out = sum(
-        l.name.startswith("Transformer/encoderblock_") for l in model.layers
+        l.name.startswith("Transformer_encoderblock_") for l in model.layers
     )
     assert n_transformers == n_transformers_out, (
         f"Wrong number of transformers ("
@@ -125,14 +125,14 @@ def load_weights_numpy(
 
     matches = []
     for tidx in range(n_transformers):
-        encoder = model.get_layer(f"Transformer/encoderblock_{tidx}")
-        source_prefix = f"Transformer/encoderblock_{tidx}"
+        encoder = model.get_layer(f"Transformer_encoderblock_{tidx}")
+        source_prefix = f"Transformer_encoderblock_{tidx}"
         matches.extend(
             [
                 {
                     "layer": layer,
                     "keys": [
-                        f"{source_prefix}/{norm}/{name}" for name in ["scale", "bias"]
+                        f"{source_prefix}_{norm}_{name}" for name in ["scale", "bias"]
                     ],
                 }
                 for norm, layer in [
@@ -143,10 +143,10 @@ def load_weights_numpy(
             + [
                 {
                     "layer": encoder.mlpblock.get_layer(
-                        f"{source_prefix}/Dense_{mlpdense}"
+                        f"{source_prefix}_Dense_{mlpdense}"
                     ),
                     "keys": [
-                        f"{source_prefix}/MlpBlock_3/Dense_{mlpdense}/{name}"
+                        f"{source_prefix}_MlpBlock_3_Dense_{mlpdense}_{name}"
                         for name in ["kernel", "bias"]
                     ],
                 }
@@ -156,7 +156,7 @@ def load_weights_numpy(
                 {
                     "layer": layer,
                     "keys": [
-                        f"{source_prefix}/MultiHeadDotProductAttention_1/{attvar}/{name}"
+                        f"{source_prefix}_MultiHeadDotProductAttention_1_{attvar}_{name}"
                         for name in ["kernel", "bias"]
                     ],
                     "reshape": True,
@@ -171,30 +171,30 @@ def load_weights_numpy(
         )
     for layer_name in ["embedding", "head", "pre_logits"]:
         if layer_name == "head" and not pretrained_top:
-            source_keys_used.extend(["head/kernel", "head/bias"])
+            source_keys_used.extend(["head_kernel", "head_bias"])
             continue
         if layer_name == "pre_logits" and not pre_logits:
             continue
         matches.append(
             {
                 "layer": model.get_layer(layer_name),
-                "keys": [f"{layer_name}/{name}" for name in ["kernel", "bias"]],
+                "keys": [f"{layer_name}_{name}" for name in ["kernel", "bias"]],
             }
         )
     matches.append({"layer": model.get_layer("class_token"), "keys": ["cls"]})
     matches.append(
         {
-            "layer": model.get_layer("Transformer/encoder_norm"),
-            "keys": [f"Transformer/encoder_norm/{name}" for name in ["scale", "bias"]],
+            "layer": model.get_layer("Transformer_encoder_norm"),
+            "keys": [f"Transformer_encoder_norm_{name}" for name in ["scale", "bias"]],
         }
     )
     apply_embedding_weights(
-        target_layer=model.get_layer("Transformer/posembed_input"),
-        source_weights=params_dict["Transformer/posembed_input/pos_embedding"],
+        target_layer=model.get_layer("Transformer_posembed_input"),
+        source_weights=params_dict["Transformer_posembed_input_pos_embedding"],
         num_x_patches=num_x_patches,
         num_y_patches=num_y_patches,
     )
-    source_keys_used.append("Transformer/posembed_input/pos_embedding")
+    source_keys_used.append("Transformer_posembed_input_pos_embedding")
     for match in matches:
         source_keys_used.extend(match["keys"])
         source_weights = [params_dict[k] for k in match["keys"]]
