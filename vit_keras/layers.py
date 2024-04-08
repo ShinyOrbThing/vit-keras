@@ -1,6 +1,5 @@
 # pylint: disable=arguments-differ,missing-function-docstring,missing-class-docstring,unexpected-keyword-arg,no-value-for-parameter
 import tensorflow as tf
-import tensorflow_addons as tfa
 
 
 @tf.keras.utils.register_keras_serializable()
@@ -137,18 +136,13 @@ class TransformerBlock(tf.keras.layers.Layer):
             name="MultiHeadDotProductAttention_1",
         )
         self.mlpblock = tf.keras.Sequential(
-            [
-                tf.keras.layers.Dense(
+            [tf.keras.layers.Dense(
                     self.mlp_dim,
                     activation="linear",
                     name=f"{self.name}/Dense_0",
                 ),
                 tf.keras.layers.Lambda(
                     lambda x: tf.keras.activations.gelu(x, approximate=False)
-                )
-                if hasattr(tf.keras.activations, "gelu")
-                else tf.keras.layers.Lambda(
-                    lambda x: tfa.activations.gelu(x, approximate=False)
                 ),
                 tf.keras.layers.Dropout(self.dropout),
                 tf.keras.layers.Dense(input_shape[-1], name=f"{self.name}/Dense_1"),
