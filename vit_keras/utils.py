@@ -106,6 +106,7 @@ def load_weights_numpy(
         params_path, allow_pickle=False
     )  # pylint: disable=unexpected-keyword-arg
     source_keys = list(params_dict.keys())
+    print("SOURCE KEYS:\n", source_keys)
     pre_logits = any(l.name == "pre_logits" for l in model.layers)
     source_keys_used = []
     n_transformers = len(

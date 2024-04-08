@@ -322,3 +322,12 @@ def vit_l32(
             image_size=image_size,
         )
     return model
+
+if __name__ == "__main__":
+    vit_model = vit_b16(
+        image_size = 224,
+        activation = 'relu',
+        pretrained = True,
+        include_top = False,
+        pretrained_top = False,
+        classes = 37)

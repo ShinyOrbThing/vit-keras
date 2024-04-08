@@ -7,7 +7,7 @@ def test_saving():
     inp = tf.keras.layers.Input(shape=(256, 256, 3))
     base = vit.vit_b16(  # type: ignore
         image_size=256,
-        pretrained=False,
+        pretrained=True,
         include_top=False,
         pretrained_top=False,
     )
