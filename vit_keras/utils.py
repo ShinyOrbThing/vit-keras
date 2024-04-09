@@ -74,6 +74,7 @@ def apply_embedding_weights(target_layer, source_weights, num_x_patches, num_y_p
         num_y_patches: Number of patches in height of image.
     """
     
+    print(target_layer)
     print(target_layer.weights)
     expected_shape = target_layer.weights[0].shape
 
