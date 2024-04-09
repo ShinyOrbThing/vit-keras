@@ -133,6 +133,7 @@ def load_weights_numpy(
     for tidx in range(n_transformers):
         encoder = model.get_layer(f"Transformer_encoderblock_{tidx}")
         source_prefix = f"Transformer/encoderblock_{tidx}"
+        model_layer_prefix=f"Transformer_encoderblock_{tidx}"
         matches.extend(
             [
                 {
@@ -149,7 +150,7 @@ def load_weights_numpy(
             + [
                 {
                     "layer": encoder.mlpblock.get_layer(
-                        f"{source_prefix}_Dense_{mlpdense}"
+                        f"{model_layer_prefix}_Dense_{mlpdense}"
                     ),
                     "keys": [
                         f"{source_prefix}/MlpBlock_3/Dense_{mlpdense}/{name}"
