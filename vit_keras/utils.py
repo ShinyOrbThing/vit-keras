@@ -73,7 +73,10 @@ def apply_embedding_weights(target_layer, source_weights, num_x_patches, num_y_p
         num_x_patches: Number of patches in width of image.
         num_y_patches: Number of patches in height of image.
     """
+    
+    print(target_layer.weights)
     expected_shape = target_layer.weights[0].shape
+
     if expected_shape != source_weights.shape:
         token, grid = source_weights[0, :1], source_weights[0, 1:]
         sin = int(np.sqrt(grid.shape[0]))
