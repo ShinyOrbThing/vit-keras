@@ -18,6 +18,7 @@ except ImportError:  # pragma: no cover
 
 ImageInputType = typing.Union[str, np.ndarray, "PIL.Image.Image", io.BytesIO]
 
+# TODO: fix the layer names
 
 def get_imagenet_classes() -> typing.List[str]:
     """Get the list of ImageNet 2012 classes."""
@@ -193,12 +194,25 @@ def load_weights_numpy(
             "keys": [f"Transformer/encoder_norm/{name}" for name in ["scale", "bias"]],
         }
     )
+    # print("APPLYING EMBEDDING WEIGHTS")
+    # initial_weights = model.get_layer("Transformer/posembed_input").get_weights()
+
     apply_embedding_weights(
         target_layer=model.get_layer("Transformer/posembed_input"),
         source_weights=params_dict["Transformer/posembed_input/pos_embedding"],
         num_x_patches=num_x_patches,
         num_y_patches=num_y_patches,
     )
+    # # Get the weights of the layer after calling apply_embedding_weights
+    # final_weights = model.get_layer("Transformer/posembed_input").get_weights()
+
+    # # Compare the weights before and after
+    # weights_changed = any((w1 != w2).any() for w1, w2 in zip(initial_weights, final_weights))
+    # if weights_changed:
+    #     print("Weights have changed.")
+    # else:
+    #     print("Weights have not changed.")
+    
     source_keys_used.append("Transformer/posembed_input/pos_embedding")
     for match in matches:
         source_keys_used.extend(match["keys"])
@@ -220,3 +234,4 @@ def load_weights_numpy(
         warnings.warn(
             f"Only set {target_keys_set} of {target_keys_all} weights.", UserWarning
         )
+    

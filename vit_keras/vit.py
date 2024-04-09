@@ -333,4 +333,5 @@ if __name__ == "__main__":
         pretrained_top = False,
         classes = 37)
     
+    print(vit_model.summary())
     print("done")
